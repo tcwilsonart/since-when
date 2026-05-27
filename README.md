@@ -1,14 +1,23 @@
 # ⏱️ Since When
 
-A personal recurring-task tracker. Keep a list of things you need to do regularly, log when you do them, and see how long it's been — with overdue warnings and charts over time.
+A personal recurring-task tracker built with [Streamlit](https://streamlit.io). Keep a list of things you need to do regularly — washing the dog, watering plants, mowing the lawn — log when you do them, and always know how long it's been and what's overdue.
+
+Runs as a lightweight web app in your browser. Self-host it locally, or deploy it in a Docker container on a home server, NAS (Synology, QNAP), or a Raspberry Pi so it runs continuously in the background and sends you email reminders when tasks become overdue.
 
 ## Features
 
-- **Dashboard** — all your items sorted by longest-since-done first, colour-coded by overdue status
-- **Targets** — set "must do every N days" per item; get 🟡/🔴 warnings when overdue
+- **Dashboard** — items sorted by urgency: overdue first, then nearest upcoming deadline
+- **Targets** — set "must do every N days" per item; get 🟡/🔴 overdue warnings at a glance
+- **Next Due** — see the calculated due date for every item on the dashboard
+- **Log past dates** — start tracking something today using a date it was last done weeks ago
 - **Undo** — accidentally logged something? Undo within 30 seconds
-- **History** — full log of every time you did each thing
-- **Analytics** — interval timeline, activity heatmap, frequency comparison chart
+- **History** — full log of every completion, editable and deletable
+- **Analytics** — interval timeline per item, on-time vs late breakdown, completions per month
+- **Email notifications** — get alerted once when a task goes overdue; configurable via the UI or a plain text env file
+- **Persistent storage** — all data lives in a single SQLite file, easy to back up
+
+---
+![Since When](since-when.png)
 
 ## Quickstart
 
