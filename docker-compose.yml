@@ -1,0 +1,15 @@
+services:
+  since-when:
+    build: .
+    image: since-when:latest
+    container_name: since-when
+    ports:
+      - "8502:8501"          # host 8502 → container 8501 (8501 is your other app)
+    volumes:
+      - /volume1/docker/since-when/data:/data   # Synology bind-mount; folder is auto-created
+    env_file:
+      - path: email-notifications.env
+        required: false
+    environment:
+      - DATA_DIR=/data
+    restart: unless-stopped

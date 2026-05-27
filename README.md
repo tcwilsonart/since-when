@@ -1,0 +1,131 @@
+# ⏱️ Since When
+
+A personal recurring-task tracker. Keep a list of things you need to do regularly, log when you do them, and see how long it's been — with overdue warnings and charts over time.
+
+## Features
+
+- **Dashboard** — all your items sorted by longest-since-done first, colour-coded by overdue status
+- **Targets** — set "must do every N days" per item; get 🟡/🔴 warnings when overdue
+- **Undo** — accidentally logged something? Undo within 30 seconds
+- **History** — full log of every time you did each thing
+- **Analytics** — interval timeline, activity heatmap, frequency comparison chart
+
+## Quickstart
+
+```bash
+# Create and activate the virtual environment (first time only)
+python -m venv .venv
+
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
+
+# Install dependencies (first time only)
+pip install -r requirements.txt
+
+# Run the app
+streamlit run app.py
+```
+
+Opens at http://localhost:8501. Data is stored in `since_when.db` (SQLite) in the same directory.
+
+> **Tip:** VS Code will detect the `.venv` folder and offer to use it as the Python interpreter automatically.
+
+## Status colours
+
+| Emoji | Meaning |
+|---|---|
+| 🔵 | Never logged |
+| 🟢 | Within target (or no target, last done < 14 days ago) |
+| 🟡 | Overdue by up to 50% of target |
+| 🔴 | Overdue by more than 50% of target |
+
+## Deployment (Docker / Synology NAS)
+
+### Files needed
+
+```
+app.py
+database.py
+charts.py
+mailer.py
+scheduler.py
+requirements.txt
+Dockerfile
+docker-compose.yml
+.dockerignore
+email-notifications.env   # optional — not required if configuring via the UI
+```
+
+> **Note:** Email notifications only work reliably in Docker. When running locally
+> with `streamlit run app.py`, the scheduler runs only while the app is open in
+> your browser — close it and checks stop. The Docker container runs continuously
+> in the background, so notifications fire regardless of whether you have the
+> app open.
+
+### 1 — Copy files to the NAS
+
+Copy the files above to a folder on your NAS (e.g. `/volume1/docker/since-when`), via SSH, SMB share, or however you normally transfer files.
+
+### 2 — Build and start
+
+```bash
+ssh you@nas-ip
+cd /volume1/docker/since-when
+mkdir -p data          # create the data folder before mounting
+docker compose up -d --build
+```
+
+The first build takes a few minutes while Python and the packages download. Subsequent builds are fast.
+
+### 3 — Access the app
+
+```
+http://nas-ip:8502
+```
+
+(Port `8502` is set in `docker-compose.yml` to avoid clashing with any other Streamlit app on `8501`.)
+
+### Data persistence
+
+The SQLite database is stored at `/volume1/docker/since-when/data/since_when.db` on the NAS — outside the container — so it survives rebuilds and restarts. Back it up like any other file.
+
+### Email notifications (optional)
+
+Configure via the **🔔 Notifications** tab in the app UI — no file editing needed.
+
+For Docker / headless deployments, you can also set credentials in a `.env` file
+(UI settings always take priority over `.env`):
+
+```bash
+nano email-notifications.env   # fill in SMTP_USER, SMTP_PASSWORD, NOTIFY_EMAIL
+```
+
+Gmail requires an **App Password** (not your login password).
+Generate one at [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords).
+
+`NOTIFY_EMAIL` accepts comma-separated addresses for multiple recipients.
+
+### Updating
+
+```bash
+# after copying updated files to the NAS:
+docker compose up -d --build
+```
+
+### Changing the port or data path
+
+| Setting | File | Line |
+|---|---|---|
+| Host port (default `8502`) | `docker-compose.yml` | `ports` |
+| Data folder on NAS | `docker-compose.yml` | `volumes` (left side of `:`) |
+
+---
+
+## Stack
+
+- [Streamlit](https://streamlit.io) — UI
+- [SQLite](https://www.sqlite.org) (stdlib) — storage
+- [Pandas](https://pandas.pydata.org) — data manipulation
+- [Plotly](https://plotly.com/python/) — interactive charts
