@@ -83,7 +83,7 @@ def format_next_due(row: pd.Series) -> str:
     expected = row["expected_days"]
     if not expected or pd.isna(expected):
         return "—"
-    if row["elapsed_seconds"] == sys.maxsize or row["last_logged_at"] is None:
+    if row["elapsed_seconds"] == sys.maxsize or row["last_logged_at"] is None or pd.isna(row["last_logged_at"]):
         return "—"
     last = datetime.fromisoformat(str(row["last_logged_at"]))
     due = last + timedelta(days=float(expected))

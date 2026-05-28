@@ -7,6 +7,7 @@ email-notifications.env
 *.db-shm
 
 # Python
+.vscode/
 .venv/
 __pycache__/
 *.pyc
